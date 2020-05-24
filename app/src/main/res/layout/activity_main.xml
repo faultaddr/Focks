@@ -1,18 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".ui.activity.MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/main_color"
+        tools:targetApi="lollipop">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <ImageView
+            android:id="@+id/setting_btn"
+            android:layout_width="40dp"
+            android:layout_height="30dp"
+            android:layout_gravity="start"
+            android:contentDescription="TODO"
+            android:src="@drawable/ic_main_setting" />
+
+        <RelativeLayout
+            android:layout_width="62dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/focus_mode_btn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="5dp"
+                android:layout_centerVertical="true"
+                android:src="@drawable/stay_focus" />
+
+            <View
+                android:layout_width="2dp"
+                android:layout_height="20dp"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="10dp"
+                android:layout_toLeftOf="@id/multi_people_btn"
+                android:background="#ffffff" />
+
+            <ImageView
+                android:id="@+id/multi_people_btn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="5dp"
+                android:src="@drawable/ic_remen" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:layout_gravity="right"
+
+            >
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="10dp"
+                android:src="@drawable/main_dandan" />
+
+            <TextView
+                android:layout_width="20dp"
+                android:layout_height="30dp"
+                android:text="0"
+                android:textColor="#FFFFFF"
+                android:gravity="center"
+                android:textSize="18sp"
+                android:layout_alignParentRight="true"
+                />
+        </RelativeLayout>
+    </Toolbar>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/main_color">
+
+        <TextView
+            android:id="@+id/main_hint"
+            android:layout_marginTop="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textStyle="bold"
+
+            android:text="@string/default_main_words"
+            android:gravity="center"/>
+
+        <cn.panyunyi.focks.ui.custom.xiaomiClock
+            android:id="@+id/main_clock"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true"
+/>
+    </RelativeLayout>
+
+
+</LinearLayout>
