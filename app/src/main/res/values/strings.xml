@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Focks</string>
     <string name="default_main_words">请安心学习，别老想着玩儿</string>
+    <string name="main_time_suffix">分钟</string>
 </resources>

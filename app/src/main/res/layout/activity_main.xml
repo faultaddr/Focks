@@ -57,7 +57,7 @@
             android:layout_width="60dp"
             android:layout_height="30dp"
             android:layout_gravity="right"
-
+            android:layout_marginRight="16dp"
             >
 
             <ImageView
@@ -68,7 +68,7 @@
                 android:src="@drawable/main_dandan" />
 
             <TextView
-                android:layout_width="20dp"
+                android:layout_width="wrap_content"
                 android:layout_height="30dp"
                 android:text="0"
                 android:textColor="#FFFFFF"
@@ -90,18 +90,41 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textStyle="bold"
-
             android:text="@string/default_main_words"
             android:gravity="center"/>
 
-        <cn.panyunyi.focks.ui.custom.xiaomiClock
+        <cn.panyunyi.focks.ui.custom.CircleRotate
             android:id="@+id/main_clock"
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:layout_centerHorizontal="true"
-            android:layout_centerInParent="true"
+            android:layout_below="@id/main_hint"
+            android:layout_marginTop="50dp"
 />
-    </RelativeLayout>
+
+        <TextView
+            android:id="@+id/main_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/main_clock"
+            android:layout_centerHorizontal="true"
+            android:textSize="70sp"
+            android:layout_marginTop="16dp"
+            android:textColor="@color/color_white"
+            />
+        <Button
+            android:id="@+id/main_func_btn"
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:text="开始"
+            android:layout_marginTop="32dp"
+            android:layout_below="@id/main_time"
+            android:layout_centerHorizontal="true"
+            android:background="#45b39d"
+
+
+            />
+/>    </RelativeLayout>
 
 
 </LinearLayout>
