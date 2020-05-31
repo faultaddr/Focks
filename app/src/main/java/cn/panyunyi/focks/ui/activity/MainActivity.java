@@ -119,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements CircleRotate.Radi
                     clockView.setOnTouchListener(null);
                     timer.cancel();
                     textView.setText("10:00");
+                    clockView.drawable=getResources().getDrawable(R.drawable.ic_tree);
                     clockView.changeData(0, 500, 200);
                     clockView.invalidate();
                     mFuncButton.setText("开始");
