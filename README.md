@@ -7,7 +7,9 @@ Focks 是一款设计为Forest替代品的免费软件，主要用于个人时�
 
 ---
 ![主页面](https://s1.ax1x.com/2020/06/01/t3H8ZF.jpg)
-![开始计时]](https://s1.ax1x.com/2020/06/01/t3HJIJ.jpg)
+
+![开始计时](https://s1.ax1x.com/2020/06/01/t3HJIJ.jpg)
+
 ![计时失败](https://s1.ax1x.com/2020/06/01/t3HGa4.jpg)
 
 
