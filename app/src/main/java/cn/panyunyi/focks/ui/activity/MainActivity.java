@@ -3,30 +3,57 @@ package cn.panyunyi.focks.ui.activity;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
+import android.app.AppOpsManager;
+import android.app.Service;
+import android.app.usage.UsageStats;
+import android.app.usage.UsageStatsManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
+import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.lang.reflect.Field;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NavigableSet;
+import java.util.TreeMap;
 
 import javax.security.auth.login.LoginException;
 
 import cn.panyunyi.focks.R;
+import cn.panyunyi.focks.service.GetAppStateService;
 import cn.panyunyi.focks.ui.custom.CircleRotate;
+import cn.panyunyi.focks.utils.CheckApp;
 import cn.panyunyi.focks.utils.ScreenObserver;
 import cn.panyunyi.focks.utils.StatusBarUtils;
 
+import static android.app.Service.START_STICKY;
+
 public class MainActivity extends AppCompatActivity implements CircleRotate.RadiusListener {
+
     TextView textView;
     CircleRotate clockView;
     Button mFuncButton;
@@ -35,7 +62,23 @@ public class MainActivity extends AppCompatActivity implements CircleRotate.Radi
     int displayTime;
     CountDownTimer timer;
     ScreenObserver observer;
-    View.OnTouchListener listener=new View.OnTouchListener() {
+    GetAppStateService.MyBinder binder;
+    public static boolean isAlwaysForeGround=true;
+
+    ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            binder = (GetAppStateService.MyBinder) service;
+
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    };
+    View.OnTouchListener listener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
             return true;
@@ -66,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements CircleRotate.Radi
 
                     clockView.totalRadius = (float) (msg.arg1 * 60 + msg.arg2) / (120 * 60) * 360;
                     //TODO: x,y 位置
-                    Log.e(">>>", (clockView.totalRadius / 360) + "-----" + Math.sin((float) (clockView.totalRadius / 360) * 2 * Math.PI));
+
                     clockView.x = (int) (Math.cos((float) ((clockView.totalRadius - 90) / 360.0) * 2 * Math.PI) * clockView.rawRadius) + 500;
                     clockView.y = (int) (Math.sin((float) ((clockView.totalRadius - 90) / 360.0) * 2 * Math.PI) * clockView.rawRadius) + 500;
                     //Log.e(">>>",clockView.x+"----"+clockView.y);
@@ -76,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements CircleRotate.Radi
                     clockView.setOnTouchListener(null);
                     timer.cancel();
                     textView.setText("10:00");
-                    clockView.changeData(0,500,200);
+                    clockView.changeData(0, 500, 200);
                     clockView.invalidate();
                     mFuncButton.setText("开始");
                     break;
@@ -84,17 +127,21 @@ public class MainActivity extends AppCompatActivity implements CircleRotate.Radi
         }
     };
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.e("onCreate","create");
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         StatusBarUtils.setWindowStatusBarColor(this, R.color.main_color);
+
         setContentView(R.layout.activity_main);
-        hintTextView=findViewById(R.id.main_hint);
+        checkUsagePermission();
+        hintTextView = findViewById(R.id.main_hint);
         textView = findViewById(R.id.main_time);
         clockView = findViewById(R.id.main_clock);
         mFuncButton = findViewById(R.id.main_func_btn);
-        observer=new ScreenObserver(this);
+        observer = new ScreenObserver(this);
         observer.startObserver(new ScreenObserver.ScreenStateListener() {
             @Override
             public void onScreenOn() {
@@ -109,21 +156,14 @@ public class MainActivity extends AppCompatActivity implements CircleRotate.Radi
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onUserPresent() {
-                if(mFuncButton.getText()=="取消") {
-                    hintTextView.setText("对不起你失败了，该人已变猪");
-                    timer.cancel();
-                    clockView.changeData(0, 500, 200);
-                    textView.setText("10:00");
-                    clockView.drawable=getDrawable(R.drawable.ic_pig);
-                    clockView.invalidate();
-                }
+
             }
         });
 
         clockView.setRadiusChangeListener(new CircleRotate.RadiusListener() {
             @Override
             public void onRadiusChangeListener(double radius) {
-                Log.e("radius", radius + "");
+
                 //textView.setText((int)((radius/360)*120));
                 if (mFuncButton.getText().equals("开始")) {
                     Message message = new Message();
@@ -132,6 +172,7 @@ public class MainActivity extends AppCompatActivity implements CircleRotate.Radi
                     bundle.putDouble("radius", radius);
                     message.setData(bundle);
                     mHandler.sendMessage(message);
+
                 }
             }
         });
@@ -140,9 +181,11 @@ public class MainActivity extends AppCompatActivity implements CircleRotate.Radi
             @Override
             public void onClick(View v) {
                 if (((Button) v).getText().equals("开始")) {
+                    Intent intent = new Intent(MainActivity.this, GetAppStateService.class);
+                    startService(intent);
                     hintTextView.setText("请好好学习，别玩手机");
-                    clockView.drawable=getDrawable(R.drawable.ic_femail);
-                    timer= new CountDownTimer((long) (displayTime * 60 * 1000), 1000) {
+                    clockView.drawable = getDrawable(R.drawable.ic_femail);
+                    timer = new CountDownTimer((long) (displayTime * 60 * 1000), 1000) {
                         @Override
                         public void onTick(long millisUntilFinished) {
                             Message msg = new Message();
@@ -167,7 +210,121 @@ public class MainActivity extends AppCompatActivity implements CircleRotate.Radi
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        Log.e("onStart","start");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        this.unbindService(connection);
+        observer.shutdownObserver();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Intent intent = new Intent(this, GetAppStateService.class);
+        bindService(intent, connection, Context.BIND_IMPORTANT);
+        Log.e("onResume","resume");
+        if(!isAlwaysForeGround) {
+            if (mFuncButton.getText() == "取消") {
+                hintTextView.setText("对不起你失败了，该人已变猪");
+                timer.cancel();
+                stopService(intent);
+                mFuncButton.setText("开始");
+                clockView.changeData(0, 500, 200);
+                textView.setText("10:00");
+                clockView.drawable = getDrawable(R.drawable.ic_pig);
+                clockView.invalidate();
+            }
+        }
+
+    }
+    /**
+     * 注册权限申请回调
+     *
+     * @param requestCode  申请码
+     * @param permissions  申请的权限
+     * @param grantResults 结果
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 0:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    ;
+                } else {
+                    // Permission Denied
+                    Toast.makeText(MainActivity.this, "CALL_PHONE Denied", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+                break;
+        }
+
+    }
+
+    /*
+     * android 6.0+
+     * 相机权限需要动态获取
+     *
+     *
+     *
+     * */
+    private int requestPermission() {
+        //判断Android版本是否大于23
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int checkCallPhonePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.PACKAGE_USAGE_STATS);
+            if (checkCallPhonePermission != PackageManager.PERMISSION_GRANTED) {
+
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.PACKAGE_USAGE_STATS}, 0);
+                return 0;
+            } else {
+                //已有权限
+                return 1;
+            }
+
+        } else {
+            //API 版本在23以下
+            return 1;
+        }
+
+    }
+    @Override
     public void onRadiusChangeListener(double radius) {
 
+    }
+    private boolean checkUsagePermission() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            AppOpsManager appOps = (AppOpsManager) getSystemService(Context.APP_OPS_SERVICE);
+            int mode = 0;
+            mode = appOps.checkOpNoThrow("android:get_usage_stats", android.os.Process.myUid(), getPackageName());
+            boolean granted = mode == AppOpsManager.MODE_ALLOWED;
+            if (!granted) {
+                Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                startActivityForResult(intent, 1);
+                return false;
+            }
+        }
+        return true;
+    }
+    @TargetApi(Build.VERSION_CODES.M)
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            AppOpsManager appOps = (AppOpsManager) getSystemService(Context.APP_OPS_SERVICE);
+            int mode = 0;
+            mode = appOps.checkOpNoThrow("android:get_usage_stats", android.os.Process.myUid(), getPackageName());
+            boolean granted = mode == AppOpsManager.MODE_ALLOWED;
+            if (!granted) {
+                Toast.makeText(this, "请开启该权限", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }

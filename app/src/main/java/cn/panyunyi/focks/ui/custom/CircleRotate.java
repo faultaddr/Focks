@@ -149,7 +149,6 @@ public class CircleRotate extends View {
             drawable = ContextCompat.getDrawable(mContext,R.drawable.ic_tree);
         }
 
-        System.out.println(canvas.getClipBounds().left+"--"+canvas.getClipBounds().right);
         drawable.setBounds(200,rawRadius,canvas.getClipBounds().right-200,700);
         drawable.draw(canvas);
         //canvas.drawPath(mBtn, btnPaint);
