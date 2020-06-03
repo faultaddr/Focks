@@ -2,4 +2,8 @@
     <string name="app_name">Focks</string>
     <string name="default_main_words">请安心学习，别老想着玩儿</string>
     <string name="main_time_suffix">分钟</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="default_menu_item">默认分类</string>
 </resources>

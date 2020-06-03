@@ -78,6 +78,10 @@
                 />
         </RelativeLayout>
     </Toolbar>
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -124,7 +128,71 @@
 
 
             />
-/>    </RelativeLayout>
 
+    </RelativeLayout>
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/navigation_view"
+            android:layout_width="240dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:background="@color/main_color"
+            app:menu="@menu/menu_navigation">
+
+            <!--添加脚布局-->
+            <ImageView
+                android:id="@+id/menu_add_button"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:src="@drawable/ic_add_database"
+                android:layout_gravity="center_horizontal|bottom"
+                android:layout_marginBottom="20dp"
+                />
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="48dp"-->
+<!--                android:layout_gravity="bottom"-->
+<!--                android:gravity="center"-->
+<!--                android:orientation="horizontal">-->
+
+<!--                <Button-->
+<!--                    android:id="@+id/footer_item_setting"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:adjustViewBounds="true"-->
+<!--                    android:background="@android:color/transparent"-->
+<!--                    android:drawableStart="@drawable/ic_setting"-->
+<!--                    android:drawableLeft="@drawable/ic_setting"-->
+<!--                    android:drawablePadding="1dp"-->
+<!--                    android:gravity="center"-->
+<!--                    android:paddingLeft="5dp"-->
+<!--                    android:text="设置"-->
+<!--                    android:textAlignment="inherit"-->
+<!--                    android:textColor="@color/colorPrimary"-->
+<!--                    tools:ignore="ButtonStyle" />-->
+
+<!--                <Button-->
+<!--                    android:id="@+id/footer_item_out"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:background="@android:color/transparent"-->
+<!--                    android:drawableStart="@drawable/ic_out"-->
+<!--                    android:drawableLeft="@drawable/ic_out"-->
+<!--                    android:drawablePadding="1dp"-->
+<!--                    android:gravity="center"-->
+<!--                    android:paddingLeft="5dp"-->
+<!--                    android:text="退出"-->
+<!--                    android:textAlignment="center"-->
+<!--                    android:textColor="@color/colorPrimary"/>-->
+<!--            </LinearLayout>-->
+
+        </com.google.android.material.navigation.NavigationView>
+    </androidx.drawerlayout.widget.DrawerLayout>
+    <FrameLayout
+        android:id="@+id/main_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
 
 </LinearLayout>

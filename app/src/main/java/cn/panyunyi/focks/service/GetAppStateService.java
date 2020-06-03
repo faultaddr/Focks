@@ -154,7 +154,6 @@ public class GetAppStateService extends Service {
                     topPackageName = mySortedMap.get(mySortedMap.lastKey()).getPackageName();
                 }
                 runningTopActivity = new ComponentName(topPackageName, "");
-                Log.e("top",topPackageName+"--");
             }
         }
 

@@ -5,11 +5,16 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AppOpsManager;
+import android.app.Dialog;
 import android.app.Service;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
@@ -28,14 +33,22 @@ import android.os.IBinder;
 import android.os.Message;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.internal.NavigationMenuItemView;
+import com.google.android.material.navigation.NavigationView;
+
 import java.lang.reflect.Field;
+import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableSet;
@@ -46,24 +59,31 @@ import javax.security.auth.login.LoginException;
 import cn.panyunyi.focks.R;
 import cn.panyunyi.focks.service.GetAppStateService;
 import cn.panyunyi.focks.ui.custom.CircleRotate;
+import cn.panyunyi.focks.ui.fragment.FinishDialogFragment;
 import cn.panyunyi.focks.utils.CheckApp;
 import cn.panyunyi.focks.utils.ScreenObserver;
 import cn.panyunyi.focks.utils.StatusBarUtils;
 
 import static android.app.Service.START_STICKY;
 
-public class MainActivity extends AppCompatActivity implements CircleRotate.RadiusListener {
+public class MainActivity extends AppCompatActivity implements CircleRotate.RadiusListener, View.OnClickListener {
 
     TextView textView;
     CircleRotate clockView;
     Button mFuncButton;
     TextView hintTextView;
+    ImageView settingButton;
+    NavigationView navigationView;
+    DrawerLayout drawerLayout;
+    ImageView menuAddBtn;
     double radius;
     int displayTime;
     CountDownTimer timer;
     ScreenObserver observer;
     GetAppStateService.MyBinder binder;
     public static boolean isAlwaysForeGround=true;
+    FinishDialogFragment fragment;
+    FragmentTransaction transaction;
 
     ServiceConnection connection = new ServiceConnection() {
         @Override
@@ -124,6 +144,19 @@ public class MainActivity extends AppCompatActivity implements CircleRotate.Radi
                     clockView.invalidate();
                     mFuncButton.setText("开始");
                     break;
+                case 3:
+                    Log.e("finish","finish");
+                    fragment=new FinishDialogFragment();
+                    fragment.show(getSupportFragmentManager(),"FinishDialog");
+                    Menu menu=navigationView.getMenu();
+                    View v=menu.getItem(0).getActionView();
+                    TextView view=(TextView)v.findViewById(R.id.msg_bg);
+                    DecimalFormat decimalFormat=new DecimalFormat("0.00");//构造方法的字符格式这里如果小数不足2位,会以0补足.
+
+                    float totalHours= (float) (Integer.parseInt(view.getText().toString())+displayTime/60.0);
+                    String formatHours=decimalFormat.format(totalHours);//format 返回的是字符串
+                    view.setText(formatHours);
+                    break;
             }
         }
     };
@@ -137,11 +170,22 @@ public class MainActivity extends AppCompatActivity implements CircleRotate.Radi
         StatusBarUtils.setWindowStatusBarColor(this, R.color.main_color);
 
         setContentView(R.layout.activity_main);
+
         checkUsagePermission();
+        initView();
+
+    }
+
+    private void initView() {
         hintTextView = findViewById(R.id.main_hint);
         textView = findViewById(R.id.main_time);
         clockView = findViewById(R.id.main_clock);
         mFuncButton = findViewById(R.id.main_func_btn);
+        settingButton=findViewById(R.id.setting_btn);
+        drawerLayout=findViewById(R.id.drawer_layout);
+        navigationView=findViewById(R.id.navigation_view);
+        menuAddBtn=findViewById(R.id.menu_add_button);
+
         observer = new ScreenObserver(this);
         observer.startObserver(new ScreenObserver.ScreenStateListener() {
             @Override
@@ -186,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements CircleRotate.Radi
                     startService(intent);
                     hintTextView.setText("请好好学习，别玩手机");
                     clockView.drawable = getDrawable(R.drawable.ic_femail);
-                    timer = new CountDownTimer((long) (displayTime * 60 * 1000), 1000) {
+                    timer = new CountDownTimer((long) (displayTime * 10 * 100), 1000) {
                         @Override
                         public void onTick(long millisUntilFinished) {
                             Message msg = new Message();
@@ -198,7 +242,9 @@ public class MainActivity extends AppCompatActivity implements CircleRotate.Radi
 
                         @Override
                         public void onFinish() {
-
+                            Message msg=new Message();
+                            msg.what=3;
+                            mHandler.sendMessage(msg);
                         }
                     }.start();
                 } else {
@@ -208,6 +254,8 @@ public class MainActivity extends AppCompatActivity implements CircleRotate.Radi
                 }
             }
         });
+        settingButton.setOnClickListener(this);
+        menuAddBtn.setOnClickListener(this);
     }
 
     @Override
@@ -326,6 +374,18 @@ public class MainActivity extends AppCompatActivity implements CircleRotate.Radi
             if (!granted) {
                 Toast.makeText(this, "请开启该权限", Toast.LENGTH_SHORT).show();
             }
+        }
+    }
+
+    @SuppressLint("RtlHardcoded")
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.setting_btn:
+                drawerLayout.openDrawer(Gravity.LEFT);
+                break;
+            case R.id.menu_add_button:
+                navigationView.getMenu().add(1,1,1,"hhh").setActionView(R.layout.base_hint);
         }
     }
 }
