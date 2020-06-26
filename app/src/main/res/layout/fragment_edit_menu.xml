@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="200dp"
+    tools:context=".ui.fragment.EditMenuFragment"
+    android:layout_marginLeft="60dp">
+
+
+    <RelativeLayout
+        android:layout_marginTop="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <EditText
+            android:id="@+id/edit_menu"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:hint="@string/input_menu"
+            android:layout_centerHorizontal="true"
+            />
+        <Button
+            android:id="@+id/edit_btn"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_below="@id/edit_menu"
+            android:layout_centerHorizontal="true"
+            android:background="@color/main_color"
+            android:text="@string/input_confirm"
+            />
+    </RelativeLayout>
+
+</FrameLayout>

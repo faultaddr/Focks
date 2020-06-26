@@ -6,4 +6,9 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="default_menu_item">默认分类</string>
+    <string name="input_menu">请输入新主题名</string>
+    <string name="input_confirm">确认</string>
+    <string name="person_change_2_pig">对不起你失败了，该人已变猪</string>
+    <string name="start">开始</string>
+    <string name="ten_o_clock">10:00</string>
 </resources>
