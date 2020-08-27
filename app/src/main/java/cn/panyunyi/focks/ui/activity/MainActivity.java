@@ -3,7 +3,6 @@ package cn.panyunyi.focks.ui.activity;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.menu.MenuItemImpl;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -40,6 +39,10 @@ import android.widget.Toast;
 import com.google.android.material.navigation.NavigationView;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 
 import cn.panyunyi.focks.R;
 import cn.panyunyi.focks.service.GetAppStateService;
@@ -133,14 +136,17 @@ public class MainActivity extends AppCompatActivity implements CircleRotate.Radi
                     fragment = new FinishDialogFragment();
                     fragment.show(getSupportFragmentManager(), "FinishDialog");
                     Menu menu = navigationView.getMenu();
-                    View v = menu.getItem(0).getActionView();
-                    TextView view = (TextView) v.findViewById(R.id.msg_bg);
+                    int menuId = sp.getInt("menu_item_id", -1);
+                    View v = menu.getItem(menuId).getActionView();
+                    TextView view = v.findViewById(R.id.msg_bg);
                     DecimalFormat decimalFormat = new DecimalFormat("0.00");//构造方法的字符格式这里如果小数不足2位,会以0补足.
                     float totalHours = (float) (Integer.parseInt(view.getText().toString()) + displayTime / 60.0);
                     String formatHours = decimalFormat.format(totalHours);//format 返回的是字符串
                     view.setText(formatHours);
+
                     float marks = (float) (Integer.parseInt(mainMark.getText().toString()) + displayTime / 60.0);
                     String formatMarks = decimalFormat.format(marks);
+                    sp.edit().putFloat(String.valueOf(menuId), marks).apply();
                     mainMark.setText(formatMarks);
                     break;
                 case 4:
@@ -163,8 +169,9 @@ public class MainActivity extends AppCompatActivity implements CircleRotate.Radi
         setContentView(R.layout.activity_main);
 
         checkUsagePermission();
-        initView();
         initTools();
+        initView();
+
 
     }
 
@@ -202,11 +209,28 @@ public class MainActivity extends AppCompatActivity implements CircleRotate.Radi
         mainMark = findViewById(R.id.main_marks);
 
         navigationView.setItemIconTintList(null);
-        navigationView.setCheckedItem();
+        // 增加计时主题
+        HashSet<String> titleList = (HashSet<String>) sp.getStringSet("item_title_list", new HashSet<String>());
+
+        ArrayList<String> tList = new ArrayList<>(titleList);
+        for (int i = 0; i < tList.size(); i++) {
+
+            navigationView.getMenu().add(1, i + 1, i, tList.get(i)).setActionView(R.layout.base_hint);
+            navigationView.getMenu().findItem(i + 1).setIcon(R.drawable.ic_red_point);
+            TextView view = navigationView.getMenu().findItem(i + 1).getActionView().findViewById(R.id.msg_bg);
+            view.setText(String.valueOf(sp.getInt(String.valueOf(i + 1), 0)));
+
+        }
+        //navigationView.setCheckedItem();
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 Log.i(">>>>", String.valueOf(menuItem.getTitle()));
+                int menuId = sp.getInt("menu_item_id", -1);
+                if (menuId != menuItem.getItemId()) {
+                    sp.edit().putInt("menu_item_id", menuItem.getItemId()).apply();
+                }
+
                 return true;
             }
         });
@@ -359,8 +383,11 @@ public class MainActivity extends AppCompatActivity implements CircleRotate.Radi
                     @Override
                     public void sendContent(String info) {
                         int sizeId = navigationView.getMenu().size();
-                        navigationView.getMenu().add(1, sizeId+1, 1, info).setActionView(R.layout.base_hint);
-                        navigationView.getMenu().findItem(sizeId+1).setIcon(R.drawable.ic_red_point);
+                        navigationView.getMenu().add(1, sizeId + 1, sizeId, info).setActionView(R.layout.base_hint);
+                        navigationView.getMenu().findItem(sizeId + 1).setIcon(R.drawable.ic_red_point);
+                        HashSet<String> set = (HashSet<String>) sp.getStringSet("item_title_list", new HashSet<String>());
+                        set.add(String.valueOf(info));
+                        sp.edit().putStringSet("item_title_list", set).apply();
                     }
                 });
                 break;
